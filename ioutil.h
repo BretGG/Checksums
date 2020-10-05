@@ -15,6 +15,15 @@
 #define MAX_ERROR_COUNT 1024 // size in bytes
 #define MAX_ERROR_MESSAGE 1024 // size in bytes
 
+#define BIT_0_MASK = 1
+#define BIT_1_MASK = 2
+#define BIT_2_MASK = 4
+#define BIT_3_MASK = 8
+#define BIT_4_MASK = 16
+#define BIT_5_MASK = 32
+#define BIT_6_MASK = 64
+#define BIT_7_MASK = 128
+
 /* Block data structure holding values returned from getBlock */
 typedef struct block {
     int data;
@@ -38,5 +47,7 @@ int writeErrorBlock(Block, char errMessage[]);
 
 /* Closes any file opened by loadFile */
 int closeBlock(Block block);
+
+int getBit(char byte, int bitIndex);
 
 #endif

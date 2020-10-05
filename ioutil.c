@@ -79,4 +79,9 @@ int closeBlock(Block block) {
     return SUCCESS;
  }
 
+int getBit(char byte, int bitIndex) {
+    if (bitIndex > 7) 
+        return -1;
 
+    return (byte >> bitIndex) & 0x01;
+}

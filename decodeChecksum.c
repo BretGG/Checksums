@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc > 2) {
-        status = initialize(argv[1], &block);
+        status = initialize(argv[2], &block);
     }
     else {
         status = initialize("", &block);
@@ -37,8 +37,11 @@ int main(int argc, char* argv[]) {
             bit ^= 1;
 
         writeBlock(block);
-        block->data = bit;
-        writeBlock(block);
+
+        getBlock(block, 1);
+        if (block->data != bit)
+            writeErrorBlock(block, "parity checksum failed");
+
     }
 
     closeBlock(block);
