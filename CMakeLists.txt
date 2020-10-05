@@ -11,6 +11,8 @@ ADD_LIBRARY(
 
 add_executable(encodeChecksum encodeChecksum.c ioutil.c)
 add_executable(decodeChecksum decodeChecksum.c ioutil.c)
+add_executable(encodeParity encodeParity.c ioutil.c)
+add_executable(decodeParity decodeParity.c ioutil.c)
 
 target_compile_options(encodeChecksum PRIVATE -Wpedantic -Wall -Wextra)
 
