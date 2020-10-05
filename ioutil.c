@@ -49,9 +49,9 @@ int writeErrorBlock(Block block, char errMessage[]){
     char message[MAX_ERROR_MESSAGE] = "";
 
     if (fileLocation == -1) // stdin from keyboard file location is not applicable
-        sprintf(message, "ERROR - BYTES: %02x MESSAGE: %s\n", block->data, errMessage);
+        sprintf(message, "ERROR - BYTE: %c MESSAGE: %s\n", block->data, errMessage);
     else
-        sprintf(message, "ERROR - BYTES: %02x FILE_OFFSET: %ld MESSAGE: %s\n", block->data, fileLocation, errMessage);
+        sprintf(message, "ERROR - BYTE: %c FILE_OFFSET: %ld MESSAGE: %s\n", block->data, fileLocation, errMessage);
 
     if (block->errCount >= MAX_ERROR_COUNT - 1) {
         strcpy(block->errMessages[MAX_ERROR_COUNT - 1], "Errors all the way down\n");
@@ -85,3 +85,4 @@ int getBit(char byte, int bitIndex) {
 
     return (byte >> bitIndex) & 0x01;
 }
+

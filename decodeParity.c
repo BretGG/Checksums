@@ -6,7 +6,10 @@
 
 int main(int argc, char* argv[]) {
     Block block = NULL;
-    int status;
+    int status = 0;
+    int bitCount = 0;
+    int parityBit = 0;
+    char decodeChar = 0;
 
     if (argc < 2) {
         perror("Requires 2 or 3 args");
@@ -28,20 +31,25 @@ int main(int argc, char* argv[]) {
 
     // Reading all data from input*/
     while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
-        int bit = 0;
-        for (int i = 0; i < 8; i++){
-            bit ^= getBit(block->data, i);
+        bitCount++;
+        char data;
+
+        if (bitCount == 9) {
+            if (strcmp(argv[1], "--odd") == 0)
+                parityBit ^= 1;
+
+
+            if (block->data != parityBit)
+                writeErrorBlock(block, "parity checksum failed");
+
+            block->data = decodeChar;
+            writeBlock(block);
+            continue;
         }
 
-        if (strcmp(argv[1], "--odd") == 0)
-            bit ^= 1;
-
-        writeBlock(block);
-
-        getBlock(block, 1);
-        if (block->data != bit)
-            writeErrorBlock(block, "parity checksum failed");
-
+        data = block->data - '0';
+        parityBit ^= data;
+        decodeChar = (decodeChar << 1) | data;
     }
 
     closeBlock(block);

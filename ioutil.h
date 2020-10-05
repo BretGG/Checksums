@@ -12,6 +12,7 @@
 #define ERR_FILECLOSE -5
 
 #define BLOCK_SIZE 1 // size in bytes
+#define MAX_BLOCK_DATA 1024 // size in bytes
 #define MAX_ERROR_COUNT 1024 // size in bytes
 #define MAX_ERROR_MESSAGE 1024 // size in bytes
 
@@ -26,7 +27,7 @@
 
 /* Block data structure holding values returned from getBlock */
 typedef struct block {
-    int data;
+    char data;
     size_t byteCount;
     int fdInput;
     size_t errCount;
@@ -35,6 +36,18 @@ typedef struct block {
 
 /* Loads a file to be used by ioutil */
 int initialize(char* path, Block* newBlock);
+
+/* Reads the next available block of data assigning it to the Block pointer */
+int getBitBlock(Block, size_t bitCount);
+
+/* Reads the next available block of data assigning it to the Block pointer */
+int getByteBlock(Block, size_t byteCount);
+
+/* Reads the next available block of data assigning it to the Block pointer */
+int writeByteBlock(Block, size_t byteCount);
+
+/* Reads the next available block of data assigning it to the Block pointer */
+int writeBitBlock(Block, size_t bitCount);
 
 /* Reads the next available block of data assigning it to the Block pointer */
 int getBlock(Block, size_t byteCount);

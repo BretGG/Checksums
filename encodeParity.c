@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc > 2) {
-        status = initialize(argv[1], &block);
+        status = initialize(argv[2], &block);
     }
     else {
         status = initialize("", &block);
@@ -29,15 +29,22 @@ int main(int argc, char* argv[]) {
     // Reading all data from input*/
     while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
         int bit = 0;
+        char data = block->data;
+
         for (int i = 0; i < 8; i++){
-            bit ^= getBit(block->data, i);
+            bit ^= getBit(data, i);
         }
 
         if (strcmp(argv[1], "--odd") == 0)
             bit ^= 1;
 
-        writeBlock(block);
-        block->data = bit;
+        for (int i = 7; i >= 0; i--){
+            block->data = getBit(data, i) + '0';
+            writeBlock(block);
+        }
+
+        // Write parity bit
+        block->data = (char) bit + '0';
         writeBlock(block);
     }
 
