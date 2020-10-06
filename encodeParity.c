@@ -28,15 +28,15 @@ int main(int argc, char* argv[]) {
 
     // Reading all data from input*/
     while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
-        int bit = 0;
+        int parityBit = 0;
         char data = block->data;
 
         for (int i = 0; i < 8; i++){
-            bit ^= getBit(data, i);
+            parityBit ^= getBit(data, i);
         }
 
         if (strcmp(argv[1], "--odd") == 0)
-            bit ^= 1;
+            parityBit ^= 1;
 
         for (int i = 7; i >= 0; i--){
             block->data = getBit(data, i) + '0';
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
         }
 
         // Write parity bit
-        block->data = (char) bit + '0';
+        block->data = parityBit + '0';
         writeBlock(block);
     }
 

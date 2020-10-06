@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
     int status = 0;
     int bitCount = 0;
     int parityBit = 0;
-    char decodeChar = 0;
+    char decodedChar = 0;
 
     if (argc < 2) {
         perror("Requires 2 or 3 args");
@@ -39,17 +39,19 @@ int main(int argc, char* argv[]) {
                 parityBit ^= 1;
 
 
-            if (block->data != parityBit)
+            if (block->data - '0' != parityBit)
                 writeErrorBlock(block, "parity checksum failed");
 
-            block->data = decodeChar;
+            block->data = decodedChar;
             writeBlock(block);
+            bitCount = 0;
+            parityBit = 0;
             continue;
         }
 
         data = block->data - '0';
         parityBit ^= data;
-        decodeChar = (decodeChar << 1) | data;
+        decodedChar = (decodedChar << 1) | data;
     }
 
     closeBlock(block);
