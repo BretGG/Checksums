@@ -72,3 +72,9 @@ _deps
 # External projects
 *-prefix/
 .vscode/settings.json
+decode-crc32
+decodeChecksum
+decodeParity
+encode-crc32
+encodeChecksum
+encodeParity
