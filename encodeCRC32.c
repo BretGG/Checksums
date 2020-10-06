@@ -12,7 +12,7 @@ void copyRange(char target[], char from[], size_t size) {
 }
 
 void leftShift(char array[], size_t size) {
-    for (int i = 0; i < size - 2; i++)
+    for (int i = 0; i < size - 1; i++)
         array[i] = array[i+1];
 }
 
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 
     char data[1024] = {0};
     int dataIndex = 0;
-
+    int dataIndexWithoutPadding = 0;
     char divisor[] = {1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
 
     if (argc > 1) {
@@ -43,42 +43,45 @@ int main(int argc, char* argv[]) {
         for (int i = 7; i >= 0; i--)
             data[dataIndex++] = getBit(block->data, i);
     }
+    dataIndexWithoutPadding = dataIndex;
 
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < 31; i++)
         data[dataIndex++] = 0;
-
-    printf("data: ");
-    for (int i = 0; i < dataIndex; i++)
-        printf("%d", data[i]);
-
-    printf("\n\n");
 
     char crc[32] = {0};
     copyRange(crc, data, 32);
 
-    printf("divisor: ");
-    for (int y = 0; y < 32; y++)
-        printf("%d", divisor[y]);
-
-    printf("\n\n");
     char crcFirstBit;
-
     for (int i = 31; i < dataIndex; i++) {
-
         crcFirstBit = crc[0];
-        for (int x = 0; x < 32; x++) {
-            if (crcFirstBit == 1) {
-               // printf("%d - %d\n", crc[x], divisor[x]);
+        if (crcFirstBit == 1) {
+            for (int x = 0; x < 32; x++) {
                 crc[x] = crc[x] ^ divisor[x];
             }
         }
+
+
+        if (i != dataIndex - 1)
+            leftShift(crc, 32);
+
+        crc[31] = data[i + 1];
+    }
+
+    /*  printf("\ncrc: ");
         for (int y = 0; y < 32; y++)
-            printf("%d", crc[y]);
-        leftShift(crc, 32);
-        crc[31] = data[i];
+            printf("%d", crc[y]);*/
 
-        printf("\n");
+    // Write original data
+    block->byteCount = 1;
+    for (int i = 0; i < dataIndexWithoutPadding; i++) {
+        block->data = data[i] + '0';
+        writeBlock(block);
+    }
 
+    // Write CRC
+    for (int i = 0; i < 32; i++) {
+        block->data = crc[i] + '0';
+        writeBlock(block);
     }
 
     closeBlock(block);
