@@ -1,3 +1,13 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: encode-parity.c 
+--
+-- PROGRAM: encode-parity
+--
+-- FUNCTIONS: none
+--
+-- NOTES:
+-- This program encodes 8-bit values and appends a parity bit to the data block using even or odd parity.
+----------------------------------------------------------------------------------------------------------------------*/
 #include "ioutil.h"
 #include <unistd.h>
 #include <stdio.h>
@@ -35,6 +45,7 @@ int main(int argc, char* argv[]) {
             parityBit ^= getBit(data, i);
         }
 
+        // Checking parity flag
         if (strcmp(argv[1], "--odd") == 0)
             parityBit ^= 1;
 

@@ -38,6 +38,7 @@ int getBlock(Block block, size_t byteCount) {
     return SUCCESS;
 }
 
+
 int writeBlock(Block block) {
     if (write(STDOUT_FILENO, &block->data, block->byteCount) == -1) return ERR_FILEWRITE;
 
@@ -66,6 +67,7 @@ int writeErrorBlock(Block block, char errMessage[]){
     return SUCCESS;
 }
 
+
 int closeBlock(Block block) {
     if (block->fdInput != -1 && block->fdInput != STDIN_FILENO) 
         if (close(block->fdInput) == -1) return ERR_FILECLOSE;
@@ -80,6 +82,7 @@ int closeBlock(Block block) {
 
     return SUCCESS;
  }
+
 
 int getBit(char byte, int bitIndex) {
     if (bitIndex > 7) 

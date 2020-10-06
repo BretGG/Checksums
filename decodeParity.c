@@ -1,3 +1,14 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: decode-parity.c 
+--
+-- PROGRAM: decode-parity
+--
+-- FUNCTIONS: none
+--
+-- NOTES:
+-- This program decodes 9-bit values from even or odd parity. It also outputs an error message if an error 
+-- is encountered during parity checking.
+----------------------------------------------------------------------------------------------------------------------*/
 #include "ioutil.h"
 #include <unistd.h>
 #include <stdio.h>

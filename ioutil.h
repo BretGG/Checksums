@@ -34,33 +34,104 @@ typedef struct block {
     char errMessages[MAX_ERROR_COUNT][MAX_ERROR_MESSAGE];
 } *Block;
 
-/* Loads a file to be used by ioutil */
+/*
+-- FUNCTION: initialize
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Loads a file into a new Block to be used by the IO library.
+*/
 int initialize(char* path, Block* newBlock);
 
-/* Reads the next available block of data assigning it to the Block pointer */
+/*
+-- FUNCTION: getBitBlock
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Reads the next available block of data assigning it to the Block pointer 
+*/
 int getBitBlock(Block, size_t bitCount);
 
-/* Reads the next available block of data assigning it to the Block pointer */
+/*
+-- FUNCTION: getByteBlock
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Reads the next available block of data assigning it to the Block pointer 
+*/
 int getByteBlock(Block, size_t byteCount);
 
-/* Reads the next available block of data assigning it to the Block pointer */
+/*
+-- FUNCTION: writeByteBlock
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Reads the next available block of data assigning it to the Block pointer 
+*/
 int writeByteBlock(Block, size_t byteCount);
 
-/* Reads the next available block of data assigning it to the Block pointer */
+/*
+-- FUNCTION: writeBitBlock
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Reads the next available block of data assigning it to the Block pointer 
+*/
 int writeBitBlock(Block, size_t bitCount);
 
-/* Reads the next available block of data assigning it to the Block pointer */
+/*
+-- FUNCTION: getBlock
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Reads the next available block of data assigning it to the Block pointer 
+*/
 int getBlock(Block, size_t byteCount);
 
-/* Writes byteCount worth of data from Block to file opened using loadFile */
+/*
+-- FUNCTION: writeBlock
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Writes byteCount worth of data from Block to file opened using loadFile 
+*/
 int writeBlock(Block);
 
-/* Formats and writes block to standard out, format - ERROR: file location, file name, error description*/
+/*
+-- FUNCTION: writeErrorBlock
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Formats and writes block to standard out, format - ERROR: file location, file name, error description
+*/
 int writeErrorBlock(Block, char errMessage[]);
 
-/* Closes any file opened by loadFile */
+/*
+-- FUNCTION: closeBlock
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Closes any file opened by loadFile 
+*/
 int closeBlock(Block block);
 
+/*
+-- FUNCTION: initialize
+--
+-- RETURNS: int
+--
+-- NOTES:
+-- Returns the bit in specified index 
+*/
 int getBit(char byte, int bitIndex);
 
 #endif
