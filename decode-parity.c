@@ -49,9 +49,8 @@ int main(int argc, char* argv[]) {
             if (strcmp(argv[1], "--odd") == 0)
                 parityBit ^= 1;
 
-
             if (block->data - '0' != parityBit)
-                writeErrorBlock(block, "parity checksum failed");
+                writeErrorBlock(block, "parity failed");
 
             block->data = decodedChar;
             writeBlock(block);
