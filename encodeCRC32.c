@@ -4,53 +4,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-unsigned int crc32b(unsigned char *message) {
-   int i, j;
-   unsigned int byte, crc, mask;
+#define CRC_POLY 0x04C11DB7
 
-   printf("%c\n", message[0]);
-   i = 0;
-   crc = 0xFFFFFFFF;
-   while (message[i] != 0) {
-      byte = message[i];            // Get next byte.
-      crc = crc ^ byte;
-      for (j = 7; j >= 0; j--) {    // Do eight times.
-         mask = -(crc & 1);
-         crc = (crc >> 1) ^ (0x04C11DB7 & mask);
-      }
-      i = i + 1;
-   }
-   return ~crc;
-}
-unsigned char getCRC(unsigned char message[], unsigned char length)
-{
-  unsigned char i, j, crc = 0;
- 
-  for (i = 0; i < length; i++)
-  {
-    crc ^= message[i];
-    for (j = 0; j < 8; j++)
-    {
-      if (crc & 1)
-        crc ^= 0x04C11DB7;
-      crc >>= 1;
-    }
-  }
-  return crc;
+void copyRange(char target[], char from[], size_t size) {
+    for (int i = 0; i < size; i++)
+        target[i] = from[i];
 }
 
+void leftShift(char array[], size_t size) {
+    for (int i = 0; i < size - 2; i++)
+        array[i] = array[i+1];
+}
 
 int main(int argc, char* argv[]) {
     Block block = NULL;
     int status;
 
-    int data[1024] = {0};
+    char data[1024] = {0};
     int dataIndex = 0;
 
-    if (argc < 2) {
-        perror("Requires 2 args");
-        exit(EXIT_FAILURE);
-    }
+    char divisor[] = {1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
 
     if (argc > 1) {
         status = initialize(argv[1], &block);
@@ -74,10 +47,41 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < 32; i++)
         data[dataIndex++] = 0;
 
+    printf("data: ");
     for (int i = 0; i < dataIndex; i++)
         printf("%d", data[i]);
 
+    printf("\n\n");
+
+    char crc[32] = {0};
+    copyRange(crc, data, 32);
+
+    printf("divisor: ");
+    for (int y = 0; y < 32; y++)
+        printf("%d", divisor[y]);
+
+    printf("\n\n");
+    char crcFirstBit;
+
+    for (int i = 31; i < dataIndex; i++) {
+
+        crcFirstBit = crc[0];
+        for (int x = 0; x < 32; x++) {
+            if (crcFirstBit == 1) {
+               // printf("%d - %d\n", crc[x], divisor[x]);
+                crc[x] = crc[x] ^ divisor[x];
+            }
+        }
+        for (int y = 0; y < 32; y++)
+            printf("%d", crc[y]);
+        leftShift(crc, 32);
+        crc[31] = data[i];
+
+        printf("\n");
+
+    }
 
     closeBlock(block);
     (void) argc;
 }
+
