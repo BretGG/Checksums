@@ -49,9 +49,11 @@ int writeErrorBlock(Block block, char errMessage[]){
     char message[MAX_ERROR_MESSAGE] = "";
 
     if (fileLocation == -1) // stdin from keyboard file location is not applicable
-        sprintf(message, "ERROR - BYTE: %c MESSAGE: %s\n", block->data, errMessage);
+        sprintf(message, "ERR - MESSAGE: %s\n", errMessage);
+    else if (block->data == 0)
+        sprintf(message, "ERR - MESSAGE: %s\n", errMessage);
     else
-        sprintf(message, "ERROR - BYTE: %c FILE_OFFSET: %ld MESSAGE: %s\n", block->data, fileLocation, errMessage);
+        sprintf(message, "ERR FILE_OFFSET: %ld MESSAGE: %s\n", fileLocation, errMessage);
 
     if (block->errCount >= MAX_ERROR_COUNT - 1) {
         strcpy(block->errMessages[MAX_ERROR_COUNT - 1], "Errors all the way down\n");

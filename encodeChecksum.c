@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc > 2) {
-        status = initialize(argv[1], &block);
+        status = initialize(argv[2], &block);
     }
     else {
         status = initialize("", &block);
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
         data = block->data;
 
         for (int i = 0; i < 8; i++){
-            checksum[i] ^= getBit(data, i);
+            checksum[i] ^= getBit(data, abs(7 - i));
             parityBit ^= getBit(data, i);
         }
 
@@ -56,9 +56,9 @@ int main(int argc, char* argv[]) {
     // Handling checksum write
     for (int i = 0; i < 9; i++) {
         data = checksum[i];
-        printf("CS: %d\n", data);
         if (strcmp(argv[1], "--odd") == 0)
             data ^= 1;
+        block->byteCount = 1;
         block->data = data + '0';
         writeBlock(block);
     }
