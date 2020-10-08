@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
     int dataIndex = 0;
     char data[BUFFER_SIZE] = {0};
-    char divisor[] = {0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1}; //28
+    char divisor[] = {1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
 
     if (argc > 1) {
         status = initialize(argv[1], &block);
@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
+
     // Reading all data from input*/
     while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
         data[dataIndex++] = block->data - '0';
@@ -58,46 +59,29 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (block->fdInput != STDIN_FILENO)
-        dataIndex--;
 
-    char crc[32] = {0};
-    copyRange(crc, data, 28);
+    char crc[33] = {0};
+    copyRange(crc, data, 33);
 
-    for (int x = 0; x < dataIndex; x++)
-        printf("%d", data[x]);
-    printf("\n\n");
-
-    for (int x = 0; x < 28; x++)
-        printf("%d", crc[x]);
-    printf("\n\n");
 
     char crcFirstBit;
-    for (int i = 31; i < dataIndex - 1; i++) {
+    for (int i = 32; i < dataIndex - 1; i++) {
         crcFirstBit = crc[0];
         if (crcFirstBit == 1) {
-            for (int x = 0; x < 28; x++)
-                printf("%d", crc[x]);
-            printf("\n");
-            for (int x = 0; x < 28; x++)
-                printf("%d", divisor[x]);
-            printf("\n\n");
-            for (int x = 0; x < 28; x++) {
+            for (int x = 0; x < 33; x++) {
                 crc[x] = crc[x] ^ divisor[x];
             }
         }
 
-        for (int x = 0; x < 28; x++)
-            printf("%d", crc[x]);
-        printf("\n%d %d\n", i, dataIndex);
+        if (i < dataIndex - 2)
+            leftShift(crc, 33);
 
-        if (i != dataIndex - 2)
-            leftShift(crc, 28);
-
-        crc[28] = data[i + 1];
-
+        if (i < dataIndex - 2)
+            crc[32] = data[i + 1];
 
     }
+
+    leftShift(crc, 33);
 
     // Check if CRC is correct (0)
     for (int i = 0; i < 32; i++) {

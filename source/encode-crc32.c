@@ -26,14 +26,15 @@ void leftShift(char array[], size_t size) {
         array[i] = array[i+1];
 }
 
+
 int main(int argc, char* argv[]) {
     Block block = NULL;
     int status;
 
-    char data[1024] = {0};
+    char data[65536] = {0};
     int dataIndex = 0;
     int dataIndexWithoutPadding = 0;
-    char divisor[] = {0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
+    char divisor[] = {1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
 
     if (argc > 1) {
         status = initialize(argv[1], &block);
@@ -48,38 +49,40 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // Reading all data from input*/
     while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
         for (int i = 7; i >= 0; i--)
             data[dataIndex++] = getBit(block->data, i);
     }
+
+    if (block->fdInput != STDIN_FILENO)
+        dataIndex -= 8;
+    
     dataIndexWithoutPadding = dataIndex;
 
-    for (int i = 0; i < 31; i++)
+    for (int i = 0; i < 33; i++)
         data[dataIndex++] = 0;
 
-    char crc[32] = {0};
-    copyRange(crc, data, 32);
+    char crc[33] = {0};
+    copyRange(crc, data, 33);
 
     char crcFirstBit;
-    for (int i = 31; i < dataIndex; i++) {
+    for (int i = 32; i < dataIndex - 1; i++) {
         crcFirstBit = crc[0];
         if (crcFirstBit == 1) {
-            for (int x = 0; x < 32; x++) {
+            for (int x = 0; x < 33; x++) {
                 crc[x] = crc[x] ^ divisor[x];
             }
         }
 
+        if (i < dataIndex - 2)
+            leftShift(crc, 33);
 
-        if (i != dataIndex - 1)
-            leftShift(crc, 32);
+        if (i < dataIndex - 2)
+            crc[32] = data[i + 1];
 
-        crc[31] = data[i + 1];
     }
 
-    /*  printf("\ncrc: ");
-        for (int y = 0; y < 32; y++)
-            printf("%d", crc[y]);*/
+    leftShift(crc, 33);
 
     // Write original data
     block->byteCount = 1;
