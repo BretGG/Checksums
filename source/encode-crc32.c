@@ -1,12 +1,12 @@
 /*------------------------------------------------------------------------------------------------------------------
--- SOURCE FILE: decoded-crc32.c 
+-- SOURCE FILE: encode-crc32.c 
 --
 -- PROGRAM: decode-crc32
 --
 -- FUNCTIONS: main, leftShift, copyRange
 --
 -- NOTES:
--- This program decodes characters and checks the CRC. Checking CRC currently not in working state.
+-- This program creates a CRC using the supplied message.
 ----------------------------------------------------------------------------------------------------------------------*/
 #include "ioutil.h"
 #include <unistd.h>
@@ -29,11 +29,11 @@ void leftShift(char array[], size_t size) {
 int main(int argc, char* argv[]) {
     Block block = NULL;
     int status;
-    char decodedChar;
 
-    int dataIndex = 0;
     char data[1024] = {0};
-    char divisor[] = {1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
+    int dataIndex = 0;
+    int dataIndexWithoutPadding = 0;
+    char divisor[] = {0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,1};
 
     if (argc > 1) {
         status = initialize(argv[1], &block);
@@ -50,8 +50,14 @@ int main(int argc, char* argv[]) {
 
     // Reading all data from input*/
     while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
-        data[dataIndex++] = block->data - '0';
+        for (int i = 7; i >= 0; i--)
+            data[dataIndex++] = getBit(block->data, i);
     }
+    dataIndexWithoutPadding = dataIndex;
+
+    for (int i = 0; i < 31; i++)
+        data[dataIndex++] = 0;
+
     char crc[32] = {0};
     copyRange(crc, data, 32);
 
@@ -71,28 +77,22 @@ int main(int argc, char* argv[]) {
         crc[31] = data[i + 1];
     }
 
-    // Check if CRC is correct (0)
+    /*  printf("\ncrc: ");
+        for (int y = 0; y < 32; y++)
+            printf("%d", crc[y]);*/
+
+    // Write original data
+    block->byteCount = 1;
+    for (int i = 0; i < dataIndexWithoutPadding; i++) {
+        block->data = data[i] + '0';
+        writeBlock(block);
+    }
+
+    // Write CRC
     for (int i = 0; i < 32; i++) {
-        if (crc[i] != 0)
-            writeErrorBlock(block, "CRC invalid");
-            break;
+        block->data = crc[i] + '0';
+        writeBlock(block);
     }
-
-
-    int bitsRead = 0;
-    for (int i = 0; i < dataIndex - 33; i++) {
-        decodedChar = (decodedChar << 1) | data[i];
-        bitsRead++;
-
-        if (bitsRead == 8) {
-            block->byteCount = 1;
-            block->data = decodedChar;
-            writeBlock(block);
-            decodedChar = 0;
-            bitsRead = 0;
-        }
-    }
-
 
     closeBlock(block);
     (void) argc;
