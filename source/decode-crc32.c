@@ -78,16 +78,16 @@ int main(int argc, char* argv[]) {
 
         if (i < dataIndex - 2)
             crc[32] = data[i + 1];
-
     }
 
     leftShift(crc, 33);
 
     // Check if CRC is correct (0)
-    for (int i = 0; i < 32; i++) {
-        if (crc[i] != 0)
+    for (int i = 0; i < 33; i++) {
+        if (crc[i] != 0) {
             writeErrorBlock(block, "CRC invalid");
             break;
+        }
     }
 
 
