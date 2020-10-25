@@ -16,54 +16,55 @@
 #include <string.h>
 
 int main(int argc, char* argv[]) {
-    Block block = NULL;
-    int status = 0;
     int bitCount = 0;
     int parityBit = 0;
     char decodedChar = 0;
+    char data;
+    FILE* file;
+
 
     if (argc < 2) {
         perror("Requires 2 or 3 args");
         exit(EXIT_FAILURE);
     }
-
+    
     if (argc > 2) {
-        status = initialize(argv[2], &block);
+        file = fopen(argv[2], "r");
     }
     else {
-        status = initialize("", &block);
+        file = stdin;
     }
 
-
-    if (status == -1) {
-        perror("initialize");
+    if (file == NULL) {
+        perror("Failed to open file");
         exit(EXIT_FAILURE);
     }
 
     // Reading all data from input*/
-    while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
+    while ((data = fgetc(file)) != EOF){
         bitCount++;
-        char data;
 
         if (bitCount == 9) {
             if (strcmp(argv[1], "--odd") == 0)
                 parityBit ^= 1;
 
-            if (block->data - '0' != parityBit)
-                writeErrorBlock(block, "parity failed");
+            if (data - '0' != parityBit) {
+                printf("Parity failed");
+                exit(SUCCESS);
+            }
 
-            block->data = decodedChar;
-            writeBlock(block);
+            data = decodedChar;
+            printf("%c", data);
             bitCount = 0;
             parityBit = 0;
             continue;
         }
 
-        data = block->data - '0';
+        data = data - '0';
         parityBit ^= data;
         decodedChar = (decodedChar << 1) | data;
     }
 
-    closeBlock(block);
+    fclose(file);
     (void) argc;
 }

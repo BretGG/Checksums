@@ -14,32 +14,36 @@
 #include <stdlib.h>
 #include <string.h>
 
+int getBit(char byte, int bitIndex) {
+    if (bitIndex > 7) 
+        return -1;
+
+    return (byte >> bitIndex) & 0x01;
+}
 int main(int argc, char* argv[]) {
-    Block block = NULL;
-    int status;
+    char data;
+    FILE* file;
 
     if (argc < 2) {
         perror("Requires 2 or 3 args");
         exit(EXIT_FAILURE);
     }
-
+    
     if (argc > 2) {
-        status = initialize(argv[2], &block);
+        file = fopen(argv[2], "r");
     }
     else {
-        status = initialize("", &block);
+        file = stdin;
     }
 
-
-    if (status == -1) {
-        perror("initialize");
+    if (file == NULL) {
+        perror("Failed to open file");
         exit(EXIT_FAILURE);
     }
 
     // Reading all data from input*/
-    while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
+    while ((data = fgetc(file)) != EOF){
         int parityBit = 0;
-        char data = block->data;
 
         for (int i = 0; i < 8; i++){
             parityBit ^= getBit(data, i);
@@ -50,15 +54,13 @@ int main(int argc, char* argv[]) {
             parityBit ^= 1;
 
         for (int i = 7; i >= 0; i--){
-            block->data = getBit(data, i) + '0';
-            writeBlock(block);
+            printf("%c", getBit(data, i) + '0');
         }
 
         // Write parity bit
-        block->data = parityBit + '0';
-        writeBlock(block);
+        printf("%c", parityBit + '0');
     }
 
-    closeBlock(block);
+    fclose(file);
     (void) argc;
 }

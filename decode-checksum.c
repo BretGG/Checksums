@@ -15,59 +15,54 @@
 #include <string.h>
 
 int main(int argc, char* argv[]) {
-    Block block = NULL;
-    int status;
-    int data;
     int bitCount;
     int parityBit;
 
-    int decodedCharIndex;
+    int decodedCharIndex = 0;
+    char data;
     char decodedChar;
     char decodedChars[512] = {0};
+    FILE* file;
 
     int blocks[512][9] = {0};
     int blocksIndex = 0;
 
     int blockData[9] = {0};
 
-    int checksumGood = 0;
-    int checksum[9] = {0};
-    int finishedChecksum[9] = {0};
-
-
     if (argc < 2) {
         perror("Requires 2 or 3 args");
         exit(EXIT_FAILURE);
     }
-
+    
     if (argc > 2) {
-        status = initialize(argv[2], &block);
+        file = fopen(argv[2], "r");
     }
     else {
-        status = initialize("", &block);
+        file = stdin;
     }
 
 
-    if (status == -1) {
-        perror("initialize");
+    if (file == NULL) {
+        perror("Failed to open file");
         exit(EXIT_FAILURE);
     }
 
     // Reading all data from input*/
-    while (getBlock(block, 1) == SUCCESS && block->byteCount > 0) {
+    while ((data = fgetc(file)) != EOF){
         bitCount++;
-        char data;
 
         if (bitCount == 9) {
             if (strcmp(argv[1], "--odd") == 0)
                 parityBit ^= 1;
 
-            if (block->data - '0' != parityBit)
-                writeErrorBlock(block, "parity failed");
+            if (data - '0' != parityBit) {
+                printf("Parity Failed");
+                exit(EXIT_SUCCESS);
+            }
 
             blockData[bitCount - 1] = parityBit;
 
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; i++) 
                 blocks[blocksIndex][i] = blockData[i];
             blocksIndex++;
 
@@ -78,12 +73,9 @@ int main(int argc, char* argv[]) {
             continue;
         }
 
-        data = block->data - '0';
-
+        data = data - '0';
         blockData[bitCount - 1] = data;
-
         parityBit ^= data;
-
         decodedChar = (decodedChar << 1) | data;
     }
 
@@ -99,17 +91,15 @@ int main(int argc, char* argv[]) {
             parityBit ^= 1;
 
         if (blocks[blocksIndex - 1][i] != parityBit){
-            writeErrorBlock(block, "checksum failed");
-            break;
+            printf("Checksum failed");
+            exit(EXIT_SUCCESS);
         }
     }
+    
+    for (int i = 0; i < decodedCharIndex - 1; i++)
+        fputc(decodedChars[i], stdout);
 
-    for (int i = 0; i < decodedCharIndex - 1; i++){
-        block->byteCount = 1;
-        block->data = decodedChars[i];
-        writeBlock(block);
-    }
-
-    closeBlock(block);
+    fclose(file);
     (void) argc;
 }
+
