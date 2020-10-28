@@ -11,5 +11,5 @@ add_executable(decode-parity decode-parity.c)
 add_executable(encode-crc32 encode-crc32.c ioutil.c)
 add_executable(decode-crc32 decode-crc32.c ioutil.c)
 
-target_compile_options(encode-checksum PRIVATE -Wpedantic -Wall -Wextra)
+target_compile_options(encode-checksum PRIVATE -Wpedantic -Wall -Wextra -g)
 

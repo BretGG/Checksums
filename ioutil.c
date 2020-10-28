@@ -50,9 +50,9 @@ int writeErrorBlock(Block block, char errMessage[]){
     char message[MAX_ERROR_MESSAGE] = "";
 
     if (block->data == 0)
-        sprintf(message, "ERROR - FILE_OFFSET: %ld MESSAGE: %s\n", fileLocation, errMessage);
+        sprintf(message, "ERROR - FILE_OFFSET: %lld MESSAGE: %s\n", fileLocation, errMessage);
     else
-        sprintf(message, "ERROR - FILE_OFFSET: %ld MESSAGE: %s\n", fileLocation, errMessage);
+        sprintf(message, "ERROR - FILE_OFFSET: %lld MESSAGE: %s\n", fileLocation, errMessage);
 
     if (block->errCount >= MAX_ERROR_COUNT - 1) {
         strcpy(block->errMessages[MAX_ERROR_COUNT - 1], "Errors all the way down\n");
